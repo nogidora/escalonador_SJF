@@ -118,10 +118,8 @@ int main(int argc, char *argv[]){
 
    start(kernels, taskList, nProc, nLinhas);   
    scanTask(entrada, taskList, nLinhas);
-   printTask(taskList, nLinhas);
    bolhasort(taskList, nLinhas);
-   printTask(taskList, nLinhas);
-
+   
    while(time < 100){//rever
       for(int i = 0; i < nLinhas; i++){
          for(int j = 0; j < nProc; j++){
