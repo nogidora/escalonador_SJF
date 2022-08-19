@@ -1,7 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#include<stdbool.h>
 
 typedef struct{
    int time;
@@ -41,6 +40,19 @@ void bolhasort(task arr[], int nlinhas){
      }
    }
 }
+
+void reversesort(task arr[], int nlinhas){
+   int i, j;
+   for (i = 0; i < (nlinhas-1); i++){
+      for (j = 0; j < (nlinhas-i-1); j++){
+         if (arr[j].time < arr[j+1].time){
+            swap(&arr[j], &arr[j+1]);
+        }
+     }
+   }
+}
+
+
 
 void scanTask(FILE *ptr, task vetor[], int nLinhas){
    for (int i = 0; i < nLinhas; i++){
@@ -89,6 +101,7 @@ void start(processor vetor[], task vetor2[], int nProc, int nLinhas){
       vetor2[j].wait = 1;
    }
 }
+
 void printProc(FILE *saida, processor proc [], int nProc){
    for(int i = 0; i < nProc; i++){
       fprintf(saida, "Processador_%d\n", i+1);
@@ -99,9 +112,20 @@ void printProc(FILE *saida, processor proc [], int nProc){
    }
 }
 
+int contaTempo(processor proc[], int nProc){
+   int aux = 0;
+   for (int i = 0; i <nProc; i ++){
+      if(proc[i].busyUntil > aux){
+         aux = proc[i].busyUntil;
+         return aux;
+      }
+   }
+}
+
 int main(int argc, char *argv[]){
    int time = 0;
    int nProc = atoi(argv[2]);
+   int elapsedTime = 0;
 
    FILE *entrada;
    FILE *saida;
@@ -116,10 +140,18 @@ int main(int argc, char *argv[]){
    int nLinhas = getLines(entrada);
    task taskList[nLinhas];
 
-   start(kernels, taskList, nProc, nLinhas);   
+   start(kernels, taskList, nProc, nLinhas);
    scanTask(entrada, taskList, nLinhas);
-   bolhasort(taskList, nLinhas);
    
+   printf("=======================\n");
+   if (strcmp(argv[3], "SJF") == 0){
+      printf("Opção escolhida: SJF ||\n");
+      bolhasort(taskList, nLinhas);
+   }
+   else if (strcmp(argv[3], "LJF") == 0){
+      printf("Opção escolhida: LJF ||\n");
+      reversesort(taskList, nLinhas);
+   }
    while(time < 100){//rever
       for(int i = 0; i < nLinhas; i++){
          for(int j = 0; j < nProc; j++){
@@ -130,9 +162,11 @@ int main(int argc, char *argv[]){
       }
       time ++;
    }
-
+   
+   elapsedTime = contaTempo(kernels, nProc);
+   printf("Tempo decorrido: %d  ||\n", elapsedTime);
    printProc(saida, kernels, nProc);
-
+   printf("=======================\n");
    fclose(entrada);
    fclose(saida);
 }
